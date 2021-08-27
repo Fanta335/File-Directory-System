@@ -1,0 +1,26 @@
+{
+  "name": "file-directory-system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fanta335/File-Directory-System.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Fanta335/File-Directory-System/issues"
+  },
+  "homepage": "https://github.com/Fanta335/File-Directory-System#readme",
+  "devDependencies": {
+    "typescript": "^4.4.2"
+  },
+  "dependencies": {
+    "@types/node": "^16.7.2"
+  }
+}
