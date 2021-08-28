@@ -5,3 +5,19 @@ p {
 .bg-green {
   background-color:#29A844;
 }
+
+.user-name{
+  color: aqua;
+}
+
+.atmark{
+  color: white;
+}
+
+.pc-name{
+  color: blue;
+}
+
+.command-input{
+  color: white;
+}
