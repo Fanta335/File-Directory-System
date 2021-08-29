@@ -1,23 +1,36 @@
+body {
+  font-family: Monaco;
+}
+
+h1 {
+  font-family: Futura;
+  margin: 0;
+}
+
 p {
   margin: 0;
 }
 
-.bg-green {
-  background-color:#29A844;
+.vh-60 {
+  height: 60vh;
 }
 
-.user-name{
+.bg-green {
+  background-color: #29a844;
+}
+
+.user-name {
   color: aqua;
 }
 
-.atmark{
+.atmark {
   color: white;
 }
 
-.pc-name{
-  color: blue;
+.pc-name {
+  color: magenta;
 }
 
-.command-input{
+.command-input {
   color: white;
 }
