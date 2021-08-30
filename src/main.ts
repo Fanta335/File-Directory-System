@@ -139,6 +139,7 @@ class Controller {
   }
 
   public static addCommandToList(commandList: CommandList) {
+    if (config.CLITextInput.value === "") return;
     commandList.add(new Command(config.CLITextInput.value));
   }
 
