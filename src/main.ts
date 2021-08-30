@@ -32,7 +32,7 @@ class View {
   public static submitSearch(event: KeyboardEvent, user: User) {
     if (event.key === "Enter") {
       let header = Controller.getCommandHeader(user);
-      Controller.enterCommand(config.CLITextInput, config.CLIOutputDiv, header);
+      Controller.appendCommand(header);
     }
   }
 }
@@ -60,15 +60,15 @@ class Controller {
     return spans;
   }
 
-  public static enterCommand(inputForm: HTMLInputElement, commandContainer: Element, header: HTMLSpanElement[]) {
+  public static appendCommand(header: HTMLSpanElement[]) {
     let command = document.createElement("div");
     header.forEach((el) => command.append(el));
     let commandInput = document.createElement("span");
     commandInput.classList.add("command-input");
-    commandInput.textContent = " : " + inputForm.value;
+    commandInput.textContent = " : " + config.CLITextInput.value;
     command.append(commandInput);
-    commandContainer.append(command);
-    inputForm.value = "";
+    config.CLIOutputDiv.append(command);
+    config.CLITextInput.value = "";
   }
 }
 
