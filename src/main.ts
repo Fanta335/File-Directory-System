@@ -107,17 +107,9 @@ class View {
       Controller.addCommandToList(commandList);
       Controller.appendCommandToCLIOutputDiv(header);
     } else if (event.key === "ArrowUp") {
-      if (commandList.iterator === undefined) return;
-      else {
-        config.CLITextInput.value = commandList.iterator.data;
-        commandList.iterator = commandList.iterator !== commandList.head ? commandList.iterator.prev : commandList.iterator;
-      }
+      Controller.showPrevCommand(commandList);
     } else if (event.key === "ArrowDown") {
-      if (commandList.iterator === undefined) return;
-      else {
-        config.CLITextInput.value = commandList.iterator.data;
-        commandList.iterator = commandList.iterator !== commandList.tail ? commandList.iterator.next : commandList.iterator;
-      }
+      Controller.showNextCommand(commandList);
     }
   }
 }
@@ -159,6 +151,22 @@ class Controller {
     command.append(commandInput);
     config.CLIOutputDiv.append(command);
     config.CLITextInput.value = "";
+  }
+
+  public static showPrevCommand(commandList: CommandList) {
+    if (commandList.iterator === undefined) return;
+    else {
+      config.CLITextInput.value = commandList.iterator.data;
+      commandList.iterator = commandList.iterator !== commandList.head ? commandList.iterator.prev : commandList.iterator;
+    }
+  }
+
+  public static showNextCommand(commandList: CommandList) {
+    if (commandList.iterator === undefined) return;
+    else {
+      config.CLITextInput.value = commandList.iterator.data;
+      commandList.iterator = commandList.iterator !== commandList.tail ? commandList.iterator.next : commandList.iterator;
+    }
   }
 }
 
