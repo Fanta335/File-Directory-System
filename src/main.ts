@@ -249,6 +249,92 @@ class MTools {
   }
 }
 
+class CurrencyConvert {
+  public static readonly currencyList = [
+    {
+      locale: "India",
+      denomination: "Rupee",
+      exchangeRateJPY: 1.4442,
+    },
+    {
+      locale: "India",
+      denomination: "Paisa",
+      exchangeRateJPY: 0.014442,
+    },
+    {
+      locale: "USA",
+      denomination: "Dollar",
+      exchangeRateJPY: 106.1,
+    },
+    {
+      locale: "USA",
+      denomination: "USCent",
+      exchangeRateJPY: 1.061,
+    },
+    {
+      locale: "Europe",
+      denomination: "Euro",
+      exchangeRateJPY: 125.56,
+    },
+    {
+      locale: "Europe",
+      denomination: "EuroCent",
+      exchangeRateJPY: 1.2556,
+    },
+    {
+      locale: "UAE",
+      denomination: "Dirham",
+      exchangeRateJPY: 28.89,
+    },
+    {
+      locale: "UAE",
+      denomination: "Fils",
+      exchangeRateJPY: 0.2889,
+    },
+  ];
+
+  static commandLineParser(CLIInputString: string) {
+    let parsedStringInputArray = CLIInputString.trim().split(" ");
+    return parsedStringInputArray;
+  }
+
+  public static showAvailableLocales() {
+    let res: string[] = [];
+    CurrencyConvert.currencyList.forEach((currency) => {
+      if (res.indexOf(currency.locale) === -1) res.push(currency.locale);
+    });
+    return res;
+  }
+
+  // 利用可能なロケールのリストから1つの要素を引数として受け取り、そのロケールでサポートされているデノミテーション（通貨の単位）のリストを表示します。
+  public static showDenominations(localeInput: string) {
+    let res: string[] = [];
+    CurrencyConvert.currencyList.forEach((currency) => {
+      if (currency.locale === localeInput) res.push(currency.denomination);
+    });
+    return res;
+  }
+
+  // 変換前の通貨の単位、通貨量、変換先の通貨の単位の3つの引数を受け取り、通貨を変換し、入力と出力の値、通貨単位を表示します。sourceAmountは数値に変換される必要があります。
+  public static convert(sourceDenomination: string, sourceAmount: string, destinationDenomination: string) {
+    let sourceRate: number | undefined;
+    let destinationRate: number | undefined;
+    CurrencyConvert.currencyList.forEach((currency) => {
+      if (sourceRate !== undefined && destinationRate !== undefined) return;
+
+      if (currency.denomination === sourceDenomination) sourceRate = currency.exchangeRateJPY;
+      else if (currency.denomination === destinationDenomination) destinationRate = currency.exchangeRateJPY;
+    });
+
+    if (sourceRate === undefined || destinationRate === undefined) return;
+    let outputAmount = (sourceRate * Number(sourceAmount)) / destinationRate;
+    return [
+      { amount: Number(sourceAmount), destination: sourceDenomination },
+      { amount: outputAmount, destination: destinationDenomination },
+    ];
+  }
+}
+
 class View {
   public static submitSearch(event: KeyboardEvent, user: User, commandList: CommandList) {
     if (event.key === "Enter") {
