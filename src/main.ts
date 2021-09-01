@@ -107,27 +107,9 @@ class MTools {
     return parsedStringInputArray;
   }
 
-  static appendResultParagraph(parentDiv: HTMLDivElement, isValid: boolean, message: string) {
-    let promptName = "";
-    let promptColor = "";
-    if (isValid) {
-      promptName = "MTools";
-      promptColor = "turquoise";
-    } else {
-      promptName = "MToolsError";
-      promptColor = "red";
-    }
-    parentDiv.innerHTML += `
-      <p class="m-0">
-        <span style='color: ${promptColor}'>${promptName}</span><span class="text-white">: ${message}</span>
-      </p>
-    `;
-    return;
-  }
-
   static parsedArrayValidator(parsedStringInputArray: string[]) {
     // すべてのコマンドに適用されるルールに照らし合わせて入力をチェックします。
-    let validatorResponse = MTools.universalValidator(parsedStringInputArray);
+    let validatorResponse = MTools.initialValidator(parsedStringInputArray);
     if (!validatorResponse["isValid"]) return validatorResponse;
 
     // 入力が最初のvalidatorを通過した場合、どのコマンドが与えられたかに基づいて、より具体的な入力の検証を行います。
@@ -137,13 +119,10 @@ class MTools {
     return { isValid: true, errorMessage: "" };
   }
 
-  static universalValidator(parsedStringInputArray: string[]) {
+  static initialValidator(parsedStringInputArray: string[]) {
     let validCommandList = ["add", "subtract", "multiply", "divide", "exp", "log", "abs", "sqrt", "round", "ceil", "floor"];
-    if (parsedStringInputArray[0] != "MTools") {
-      return { isValid: false, errorMessage: `only MTools package supported by this app. input must start with 'MTools'` };
-    }
-    if (parsedStringInputArray.length != 3) {
-      return { isValid: false, errorMessage: `command line input must contain exactly 3 elements: 'packageName commandName arguments'` };
+    if (parsedStringInputArray[0] === "MTools" && parsedStringInputArray.length != 3) {
+      return { isValid: false, errorMessage: `command line input must contain exactly 3 elements: 'MTools [commandName] [arguments]'` };
     }
     if (validCommandList.indexOf(parsedStringInputArray[1]) == -1) {
       return { isValid: false, errorMessage: `MTools only supports the following commands: ${validCommandList.join(",")}` };
@@ -279,26 +258,8 @@ class CurrencyConvert {
     return res;
   }
 
-  public static appendResultParagraph(parentDiv: HTMLDivElement, isValid: boolean, message: string) {
-    let promptName = "";
-    let promptColor = "";
-    if (isValid) {
-      promptName = "CurrencyConvert";
-      promptColor = "turquoise";
-    } else {
-      promptName = "CurrencyConvertError";
-      promptColor = "red";
-    }
-    parentDiv.innerHTML += `
-      <p class="m-0">
-        <span style='color: ${promptColor}'>${promptName}</span><span class="text-white">: ${message}</span>
-      </p>
-    `;
-    return;
-  }
-
   public static parsedArrayValidator(parsedStringInputArray: string[]) {
-    let validatorResponse = CurrencyConvert.universalValidator(parsedStringInputArray);
+    let validatorResponse = CurrencyConvert.InitialValidator(parsedStringInputArray);
     if (!validatorResponse["isValid"]) return validatorResponse;
 
     let len = parsedStringInputArray.length;
@@ -308,7 +269,7 @@ class CurrencyConvert {
     return { isValid: true, errorMessage: "" };
   }
 
-  public static universalValidator(parsedStringInputArray: string[]) {
+  public static InitialValidator(parsedStringInputArray: string[]) {
     let validCommandList = ["showAvailableLocales", "showDenominations", "convert"];
     if (parsedStringInputArray[0] !== "CurrencyConvert") {
       return { isValid: false, errorMessage: `This app only supports following packages: ${config.packages.join(",")}. Input must start with package name.` };
@@ -359,7 +320,7 @@ class CurrencyConvert {
     if (argsArray.length !== 3)
       return {
         isValid: false,
-        errorMessage: `command ${commandName} requires 3 arguments: 'CurrencyConvert convert sourceDenomination sourceAmount destinationDenomination'`,
+        errorMessage: `command ${commandName} requires 3 arguments: 'CurrencyConvert convert [sourceDenomination] [sourceAmount] [destinationDenomination]'`,
       };
 
     let source = argsArray[0];
@@ -437,7 +398,8 @@ class View {
       let header = Controller.getCommandHeader(user);
       Controller.addCommandToList(commandList);
       Controller.appendCommandToCLIOutputDiv(header);
-      // Controller.MToolsValidator(parsedCLIArray);
+      Controller.universalValidator(parsedCLIArray);
+      Controller.MToolsValidator(parsedCLIArray);
       Controller.CurrencyConvertValidator(parsedCLIArray);
     } else if (event.key === "ArrowUp") {
       Controller.showPrevCommand(commandList);
@@ -508,16 +470,49 @@ class Controller {
     return parsedStringInputArray;
   }
 
+  public static universalValidator(parsedStringInputArray: string[]) {
+    let validatorResponse = { isValid: true, errorMessage: "" };
+    if (parsedStringInputArray[0] === "") return;
+    if (config.packages.indexOf(parsedStringInputArray[0]) === -1) {
+      validatorResponse = {
+        isValid: false,
+        errorMessage: `This app only supports following packages: ${config.packages.join(",")}. Input must start with package name.`,
+      };
+    }
+
+    if (!validatorResponse["isValid"]) {
+      Controller.appendResultParagraph("", false, validatorResponse["errorMessage"]);
+    }
+  }
+
+  public static appendResultParagraph(promptName: string, isValid: boolean, message: string) {
+    let promptColor = "";
+    if (isValid) {
+      promptColor = "turquoise";
+    } else {
+      promptName += "Error";
+      promptColor = "red";
+    }
+    config.CLIOutputDiv.innerHTML += `
+      <p class="m-0">
+        <span style='color: ${promptColor}'>${promptName}</span><span class="text-white">: ${message}</span>
+      </p>
+    `;
+    return;
+  }
+
   public static MToolsValidator(parsedCLIArray: string[]) {
+    if (parsedCLIArray[0] !== "MTools") return;
     let validatorResponse = MTools.parsedArrayValidator(parsedCLIArray);
-    if (validatorResponse["isValid"] == false) MTools.appendResultParagraph(config.CLIOutputDiv, false, validatorResponse["errorMessage"]);
-    else MTools.appendResultParagraph(config.CLIOutputDiv, true, MTools.evaluatedResultsStringFromParsedCLIArray(parsedCLIArray));
+    if (validatorResponse["isValid"] == false) Controller.appendResultParagraph("MTools", false, validatorResponse["errorMessage"]);
+    else Controller.appendResultParagraph("MTools", true, MTools.evaluatedResultsStringFromParsedCLIArray(parsedCLIArray));
   }
 
   public static CurrencyConvertValidator(parsedCLIArray: string[]) {
+    if (parsedCLIArray[0] !== "CurrencyConvert") return;
     let validatorResponse = CurrencyConvert.parsedArrayValidator(parsedCLIArray);
-    if (validatorResponse["isValid"] == false) CurrencyConvert.appendResultParagraph(config.CLIOutputDiv, false, validatorResponse["errorMessage"]);
-    else CurrencyConvert.appendResultParagraph(config.CLIOutputDiv, true, CurrencyConvert.evaluatedResultsStringFromParsedCLIArray(parsedCLIArray));
+    if (validatorResponse["isValid"] == false) Controller.appendResultParagraph("CurrencyConvert", false, validatorResponse["errorMessage"]);
+    else Controller.appendResultParagraph("CurrencyConvert", true, CurrencyConvert.evaluatedResultsStringFromParsedCLIArray(parsedCLIArray));
   }
 }
 
