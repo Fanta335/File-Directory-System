@@ -443,7 +443,7 @@ class Controller {
     header.forEach((el) => command.append(el));
     let commandInput = document.createElement("span");
     commandInput.classList.add("command-input");
-    commandInput.textContent = " : " + config.CLITextInput.value;
+    commandInput.textContent = ": " + config.CLITextInput.value;
     command.append(commandInput);
     config.CLIOutputDiv.append(command);
     config.CLITextInput.value = "";
@@ -488,14 +488,14 @@ class Controller {
   public static appendResultParagraph(promptName: string, isValid: boolean, message: string) {
     let promptColor = "";
     if (isValid) {
-      promptColor = "turquoise";
+      promptColor = "prompt-success";
     } else {
       promptName += "Error";
-      promptColor = "red";
+      promptColor = "prompt-error";
     }
     config.CLIOutputDiv.innerHTML += `
       <p class="m-0">
-        <span style='color: ${promptColor}'>${promptName}</span><span class="text-white">: ${message}</span>
+        <span class='${promptColor}'>${promptName}</span><span class="command-output">: ${message}</span>
       </p>
     `;
     return;

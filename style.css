@@ -15,22 +15,42 @@ p {
   height: 60vh;
 }
 
-.bg-green {
-  background-color: #29a844;
+.bg-top {
+  background: linear-gradient(#059bff, #3f0285);
+}
+
+.bg-tab {
+  background-color: #242424;
+}
+
+.bg-container{
+  background-color:rgba(0, 0, 0, 0.7);
 }
 
 .user-name {
-  color: aqua;
+  color: #05eeff;
 }
 
 .atmark {
-  color: white;
+  color: #fff;
 }
 
 .pc-name {
-  color: magenta;
+  color: #ff05ff;
 }
 
 .command-input {
-  color: white;
+  color: #fff;
+}
+
+.command-output {
+  color: #fff;
+}
+
+.prompt-success{
+  color: #33ff00;
+}
+
+.prompt-error{
+  color: #ff0000;
 }
