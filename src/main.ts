@@ -1,6 +1,7 @@
 const config = {
   CLITextInput: document.getElementById("CLITextInput") as HTMLInputElement,
   CLIOutputDiv: document.getElementById("CLIOutputDiv") as HTMLDivElement,
+  packages: ["MTools", "CurrencyConvert"],
 };
 
 class User {
@@ -124,29 +125,6 @@ class MTools {
     return;
   }
 
-  static evaluatedResultsStringFromParsedStringInputArray(parsedStringInputArray: string[]) {
-    let result = 0;
-    let argsArray = parsedStringInputArray[2].split(",").map((stringArgument) => Number(stringArgument));
-    let argA = argsArray[0];
-    let argB = argsArray[1];
-    let commandName = parsedStringInputArray[1];
-
-    if (commandName == "add") result = argA + argB;
-    else if (commandName == "subtract") result = argA - argB;
-    else if (commandName == "multiply") result = argA * argB;
-    else if (commandName == "divide") result = argA / argB;
-    else if (commandName == "exp") result = Math.pow(argA, argB);
-    else if (commandName == "log") result = Math.log(argB) / Math.log(argA);
-    else if (commandName == "sqrt") result = Math.sqrt(argA);
-    else if (commandName == "abs") result = Math.abs(argA);
-    else if (commandName == "round") result = Math.round(argA);
-    else if (commandName == "ceil") result = Math.ceil(argA);
-    else if (commandName == "floor") result = Math.floor(argA);
-    else console.log("MTools.evaluatedResultsStringFromParsedStringInputArray:: invalid command name");
-
-    return "your result is: " + result;
-  }
-
   static parsedArrayValidator(parsedStringInputArray: string[]) {
     // すべてのコマンドに適用されるルールに照らし合わせて入力をチェックします。
     let validatorResponse = MTools.universalValidator(parsedStringInputArray);
@@ -192,7 +170,7 @@ class MTools {
       return MTools.doubleArgValidator(commandArgsArray[0], argsArray);
     }
 
-    return { isValid: false, errorMessage: "eee" };
+    return { isValid: true, errorMessage: "" };
   }
 
   static singleArgValidator(commandName: string, argsArray: number[]) {
@@ -250,7 +228,7 @@ class MTools {
 }
 
 class CurrencyConvert {
-  public static readonly currencyList = [
+  public static currencyList = [
     {
       locale: "India",
       denomination: "Rupee",
@@ -293,9 +271,111 @@ class CurrencyConvert {
     },
   ];
 
-  static commandLineParser(CLIInputString: string) {
-    let parsedStringInputArray = CLIInputString.trim().split(" ");
-    return parsedStringInputArray;
+  public static getAllDenominations() {
+    let res: string[] = [];
+    CurrencyConvert.currencyList.forEach((currency) => {
+      res.push(currency.denomination);
+    });
+    return res;
+  }
+
+  public static appendResultParagraph(parentDiv: HTMLDivElement, isValid: boolean, message: string) {
+    let promptName = "";
+    let promptColor = "";
+    if (isValid) {
+      promptName = "CurrencyConvert";
+      promptColor = "turquoise";
+    } else {
+      promptName = "CurrencyConvertError";
+      promptColor = "red";
+    }
+    parentDiv.innerHTML += `
+      <p class="m-0">
+        <span style='color: ${promptColor}'>${promptName}</span><span class="text-white">: ${message}</span>
+      </p>
+    `;
+    return;
+  }
+
+  public static parsedArrayValidator(parsedStringInputArray: string[]) {
+    let validatorResponse = CurrencyConvert.universalValidator(parsedStringInputArray);
+    if (!validatorResponse["isValid"]) return validatorResponse;
+
+    let len = parsedStringInputArray.length;
+    validatorResponse = CurrencyConvert.commandArgumentsValidator(parsedStringInputArray.slice(1, len));
+    if (!validatorResponse["isValid"]) return validatorResponse;
+
+    return { isValid: true, errorMessage: "" };
+  }
+
+  public static universalValidator(parsedStringInputArray: string[]) {
+    let validCommandList = ["showAvailableLocales", "showDenominations", "convert"];
+    if (parsedStringInputArray[0] !== "CurrencyConvert") {
+      return { isValid: false, errorMessage: `This app only supports following packages: ${config.packages.join(",")}. Input must start with package name.` };
+    }
+    if (validCommandList.indexOf(parsedStringInputArray[1]) === -1) {
+      return { isValid: false, errorMessage: `CurrencyConvert only supports the following commands: ${validCommandList.join(",")}` };
+    }
+
+    return { isValid: true, errorMessage: "" };
+  }
+
+  public static commandArgumentsValidator(commandArgsArray: string[]) {
+    let noArgumentCommands = ["showAvailableLocales"];
+    let singleArgumentsCommands = ["showDenominations"];
+    let tripleArgumentsCommands = ["convert"];
+    let commandName = commandArgsArray[0];
+    let argsArray = commandArgsArray.slice(1, commandArgsArray.length);
+
+    if (noArgumentCommands.indexOf(commandName) !== -1) {
+      return CurrencyConvert.noArgValidator(commandName, argsArray);
+    }
+
+    if (singleArgumentsCommands.indexOf(commandName) !== -1) {
+      return CurrencyConvert.singleArgValidator(commandName, argsArray);
+    }
+
+    if (tripleArgumentsCommands.indexOf(commandName) !== -1) {
+      return CurrencyConvert.tripeArgValidator(commandName, argsArray);
+    }
+
+    return { isValid: true, errorMessage: "" };
+  }
+
+  public static noArgValidator(commandName: string, argsArray: string[]) {
+    if (argsArray.length !== 0) return { isValid: false, errorMessage: `command ${commandName} requires no arguments` };
+    return { isValid: true, errorMessage: "" };
+  }
+
+  public static singleArgValidator(commandName: string, argsArray: string[]) {
+    let locales = CurrencyConvert.showAvailableLocales();
+    if (argsArray.length !== 1) return { isValid: false, errorMessage: `command ${commandName} requires 1 argument` };
+    if (locales.indexOf(argsArray[0]) === -1) return { isValid: false, errorMessage: `CurrencyConvert only supports following locales: ${locales.join(",")}` };
+
+    return { isValid: true, errorMessage: "" };
+  }
+
+  public static tripeArgValidator(commandName: string, argsArray: string[]) {
+    if (argsArray.length !== 3)
+      return {
+        isValid: false,
+        errorMessage: `command ${commandName} requires 3 arguments: 'CurrencyConvert convert sourceDenomination sourceAmount destinationDenomination'`,
+      };
+
+    let source = argsArray[0];
+    let destination = argsArray[2];
+    let allDenominations = CurrencyConvert.getAllDenominations();
+
+    if (allDenominations.indexOf(source) === -1 || allDenominations.indexOf(destination) === -1) {
+      return { isValid: false, errorMessage: `CurrencyConvert only supports following denominations: ${allDenominations.join(",")}` };
+    }
+
+    let amount = Number(argsArray[1]);
+    if ((typeof amount !== "number" && isNaN(amount)) || amount <= 0) {
+      return { isValid: false, errorMessage: `sourceAmount must be number > 0` };
+    }
+
+    return { isValid: true, errorMessage: "" };
   }
 
   public static showAvailableLocales() {
@@ -317,34 +397,48 @@ class CurrencyConvert {
 
   // 変換前の通貨の単位、通貨量、変換先の通貨の単位の3つの引数を受け取り、通貨を変換し、入力と出力の値、通貨単位を表示します。sourceAmountは数値に変換される必要があります。
   public static convert(sourceDenomination: string, sourceAmount: string, destinationDenomination: string) {
-    let sourceRate: number | undefined;
-    let destinationRate: number | undefined;
+    let sourceRate: number;
+    let destinationRate: number;
     CurrencyConvert.currencyList.forEach((currency) => {
-      if (sourceRate !== undefined && destinationRate !== undefined) return;
-
       if (currency.denomination === sourceDenomination) sourceRate = currency.exchangeRateJPY;
       else if (currency.denomination === destinationDenomination) destinationRate = currency.exchangeRateJPY;
     });
 
-    if (sourceRate === undefined || destinationRate === undefined) return;
-    let outputAmount = (sourceRate * Number(sourceAmount)) / destinationRate;
-    return [
-      { amount: Number(sourceAmount), destination: sourceDenomination },
-      { amount: outputAmount, destination: destinationDenomination },
-    ];
+    let outputAmount = (sourceRate! * Number(sourceAmount)) / destinationRate!;
+    // return [
+    //   { amount: Number(sourceAmount), destination: sourceDenomination },
+    //   { amount: outputAmount, destination: destinationDenomination },
+    // ];
+    return `Input: ${sourceAmount} ${sourceDenomination}, Output: ${outputAmount} ${destinationDenomination}`;
+  }
+
+  public static evaluatedResultsStringFromParsedCLIArray(PCA: string[]) {
+    let resultMessage = "";
+    let argA = PCA[2];
+    let argB = PCA[3];
+    let argC = PCA[4];
+
+    if (PCA[1] === "showAvailableLocales") {
+      resultMessage = CurrencyConvert.showAvailableLocales().join(",");
+    } else if (PCA[1] === "showDenominations") {
+      resultMessage = CurrencyConvert.showDenominations(argA).join(",");
+    } else if (PCA[1] === "convert") {
+      resultMessage = CurrencyConvert.convert(argA, argB, argC);
+    } else console.log("CurrencyConvert.evaluatedResultsStringFromParsedCLIArray:: invalid command name");
+
+    return resultMessage;
   }
 }
 
 class View {
   public static submitSearch(event: KeyboardEvent, user: User, commandList: CommandList) {
     if (event.key === "Enter") {
-      let parsedCLIArray = MTools.commandLineParser(config.CLITextInput.value);
+      let parsedCLIArray = Controller.commandLineParser(config.CLITextInput.value);
       let header = Controller.getCommandHeader(user);
       Controller.addCommandToList(commandList);
       Controller.appendCommandToCLIOutputDiv(header);
-      let validatorResponse = MTools.parsedArrayValidator(parsedCLIArray);
-      if (validatorResponse["isValid"] == false) MTools.appendResultParagraph(config.CLIOutputDiv, false, validatorResponse["errorMessage"]);
-      else MTools.appendResultParagraph(config.CLIOutputDiv, true, MTools.evaluatedResultsStringFromParsedCLIArray(parsedCLIArray));
+      // Controller.MToolsValidator(parsedCLIArray);
+      Controller.CurrencyConvertValidator(parsedCLIArray);
     } else if (event.key === "ArrowUp") {
       Controller.showPrevCommand(commandList);
     } else if (event.key === "ArrowDown") {
@@ -407,6 +501,23 @@ class Controller {
       config.CLITextInput.value = commandList.iterator.data;
       commandList.iterator = commandList.iterator !== commandList.tail ? commandList.iterator.next : commandList.iterator;
     }
+  }
+
+  public static commandLineParser(CLIInputString: string) {
+    let parsedStringInputArray = CLIInputString.trim().split(" ");
+    return parsedStringInputArray;
+  }
+
+  public static MToolsValidator(parsedCLIArray: string[]) {
+    let validatorResponse = MTools.parsedArrayValidator(parsedCLIArray);
+    if (validatorResponse["isValid"] == false) MTools.appendResultParagraph(config.CLIOutputDiv, false, validatorResponse["errorMessage"]);
+    else MTools.appendResultParagraph(config.CLIOutputDiv, true, MTools.evaluatedResultsStringFromParsedCLIArray(parsedCLIArray));
+  }
+
+  public static CurrencyConvertValidator(parsedCLIArray: string[]) {
+    let validatorResponse = CurrencyConvert.parsedArrayValidator(parsedCLIArray);
+    if (validatorResponse["isValid"] == false) CurrencyConvert.appendResultParagraph(config.CLIOutputDiv, false, validatorResponse["errorMessage"]);
+    else CurrencyConvert.appendResultParagraph(config.CLIOutputDiv, true, CurrencyConvert.evaluatedResultsStringFromParsedCLIArray(parsedCLIArray));
   }
 }
 
