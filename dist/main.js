@@ -125,7 +125,7 @@ class MTools {
     static singleArgValidator(commandName, argsArray) {
         if (argsArray.length != 1)
             return { isValid: false, errorMessage: `command ${commandName} requires exactly 1 argument` };
-        if (commandName == "sqrt" && argsArray[1] < 0)
+        if (commandName == "sqrt" && argsArray[0] < 0)
             return { isValid: false, errorMessage: `command ${commandName} only supports arguments with value >= 0` };
         return { isValid: true, errorMessage: "" };
     }
