@@ -1,7 +1,7 @@
 const config = {
   CLITextInput: document.getElementById("CLITextInput") as HTMLInputElement,
   CLIOutputDiv: document.getElementById("CLIOutputDiv") as HTMLDivElement,
-  packages: ["MTools", "CurrencyConvert"],
+  packages: ["MTools", "CCTools"],
 };
 
 class User {
@@ -206,7 +206,7 @@ class MTools {
   }
 }
 
-class CurrencyConvert {
+class CCTools {
   public static currencyList = [
     {
       locale: "India",
@@ -252,18 +252,18 @@ class CurrencyConvert {
 
   public static getAllDenominations() {
     let res: string[] = [];
-    CurrencyConvert.currencyList.forEach((currency) => {
+    CCTools.currencyList.forEach((currency) => {
       res.push(currency.denomination);
     });
     return res;
   }
 
   public static parsedArrayValidator(parsedStringInputArray: string[]) {
-    let validatorResponse = CurrencyConvert.InitialValidator(parsedStringInputArray);
+    let validatorResponse = CCTools.InitialValidator(parsedStringInputArray);
     if (!validatorResponse["isValid"]) return validatorResponse;
 
     let len = parsedStringInputArray.length;
-    validatorResponse = CurrencyConvert.commandArgumentsValidator(parsedStringInputArray.slice(1, len));
+    validatorResponse = CCTools.commandArgumentsValidator(parsedStringInputArray.slice(1, len));
     if (!validatorResponse["isValid"]) return validatorResponse;
 
     return { isValid: true, errorMessage: "" };
@@ -272,7 +272,7 @@ class CurrencyConvert {
   public static InitialValidator(parsedStringInputArray: string[]) {
     let validCommandList = ["showAvailableLocales", "showDenominations", "convert"];
     if (validCommandList.indexOf(parsedStringInputArray[1]) === -1) {
-      return { isValid: false, errorMessage: `CurrencyConvert only supports the following commands:\n${validCommandList.join("\n")}` };
+      return { isValid: false, errorMessage: `CCTools only supports the following commands:\n${validCommandList.join("\n")}` };
     }
 
     return { isValid: true, errorMessage: "" };
@@ -286,15 +286,15 @@ class CurrencyConvert {
     let argsArray = commandArgsArray.slice(1, commandArgsArray.length);
 
     if (noArgumentCommands.indexOf(commandName) !== -1) {
-      return CurrencyConvert.noArgValidator(commandName, argsArray);
+      return CCTools.noArgValidator(commandName, argsArray);
     }
 
     if (singleArgumentsCommands.indexOf(commandName) !== -1) {
-      return CurrencyConvert.singleArgValidator(commandName, argsArray);
+      return CCTools.singleArgValidator(commandName, argsArray);
     }
 
     if (tripleArgumentsCommands.indexOf(commandName) !== -1) {
-      return CurrencyConvert.tripeArgValidator(commandName, argsArray);
+      return CCTools.tripeArgValidator(commandName, argsArray);
     }
 
     return { isValid: true, errorMessage: "" };
@@ -306,9 +306,9 @@ class CurrencyConvert {
   }
 
   public static singleArgValidator(commandName: string, argsArray: string[]) {
-    let locales = CurrencyConvert.showAvailableLocales();
+    let locales = CCTools.showAvailableLocales();
     if (argsArray.length !== 1) return { isValid: false, errorMessage: `command ${commandName} requires 1 argument` };
-    if (locales.indexOf(argsArray[0]) === -1) return { isValid: false, errorMessage: `CurrencyConvert only supports following locales:\n${locales.join("\n")}` };
+    if (locales.indexOf(argsArray[0]) === -1) return { isValid: false, errorMessage: `CCTools only supports following locales:\n${locales.join("\n")}` };
 
     return { isValid: true, errorMessage: "" };
   }
@@ -317,15 +317,15 @@ class CurrencyConvert {
     if (argsArray.length !== 3)
       return {
         isValid: false,
-        errorMessage: `command ${commandName} requires 3 arguments: 'CurrencyConvert convert [sourceDenomination] [sourceAmount] [destinationDenomination]'`,
+        errorMessage: `command ${commandName} requires 3 arguments: 'CCTools convert [sourceDenomination] [sourceAmount] [destinationDenomination]'`,
       };
 
     let source = argsArray[0];
     let destination = argsArray[2];
-    let allDenominations = CurrencyConvert.getAllDenominations();
+    let allDenominations = CCTools.getAllDenominations();
 
     if (allDenominations.indexOf(source) === -1 || allDenominations.indexOf(destination) === -1) {
-      return { isValid: false, errorMessage: `CurrencyConvert only supports following denominations:\n${allDenominations.join("\n")}` };
+      return { isValid: false, errorMessage: `CCTools only supports following denominations:\n${allDenominations.join("\n")}` };
     }
 
     let amount = Number(argsArray[1]);
@@ -338,7 +338,7 @@ class CurrencyConvert {
 
   public static showAvailableLocales() {
     let res: string[] = [];
-    CurrencyConvert.currencyList.forEach((currency) => {
+    CCTools.currencyList.forEach((currency) => {
       if (res.indexOf(currency.locale) === -1) res.push(currency.locale);
     });
     return res;
@@ -347,7 +347,7 @@ class CurrencyConvert {
   // 利用可能なロケールのリストから1つの要素を引数として受け取り、そのロケールでサポートされているデノミテーション（通貨の単位）のリストを表示します。
   public static showDenominations(localeInput: string) {
     let res: string[] = [];
-    CurrencyConvert.currencyList.forEach((currency) => {
+    CCTools.currencyList.forEach((currency) => {
       if (currency.locale === localeInput) res.push(currency.denomination);
     });
     return res;
@@ -357,16 +357,12 @@ class CurrencyConvert {
   public static convert(sourceDenomination: string, sourceAmount: string, destinationDenomination: string) {
     let sourceRate: number;
     let destinationRate: number;
-    CurrencyConvert.currencyList.forEach((currency) => {
+    CCTools.currencyList.forEach((currency) => {
       if (currency.denomination === sourceDenomination) sourceRate = currency.exchangeRateJPY;
       if (currency.denomination === destinationDenomination) destinationRate = currency.exchangeRateJPY;
     });
 
     let outputAmount = (sourceRate! * Number(sourceAmount)) / destinationRate!;
-    // return [
-    //   { amount: Number(sourceAmount), destination: sourceDenomination },
-    //   { amount: outputAmount, destination: destinationDenomination },
-    // ];
     return `Input: ${sourceAmount} ${sourceDenomination}, Output: ${outputAmount} ${destinationDenomination}`;
   }
 
@@ -377,12 +373,12 @@ class CurrencyConvert {
     let argC = PCA[4];
 
     if (PCA[1] === "showAvailableLocales") {
-      resultMessage = CurrencyConvert.showAvailableLocales().join("\n");
+      resultMessage = CCTools.showAvailableLocales().join("\n");
     } else if (PCA[1] === "showDenominations") {
-      resultMessage = CurrencyConvert.showDenominations(argA).join("\n");
+      resultMessage = CCTools.showDenominations(argA).join("\n");
     } else if (PCA[1] === "convert") {
-      resultMessage = CurrencyConvert.convert(argA, argB, argC);
-    } else console.log("CurrencyConvert.evaluatedResultsStringFromParsedCLIArray:: invalid command name");
+      resultMessage = CCTools.convert(argA, argB, argC);
+    } else console.log("CCTools.evaluatedResultsStringFromParsedCLIArray:: invalid command name");
 
     return resultMessage;
   }
@@ -397,7 +393,7 @@ class View {
       Controller.appendCommandToCLIOutputDiv(header);
       Controller.universalValidator(parsedCLIArray);
       Controller.MToolsValidator(parsedCLIArray);
-      Controller.CurrencyConvertValidator(parsedCLIArray);
+      Controller.CCToolsValidator(parsedCLIArray);
     } else if (event.key === "ArrowUp") {
       Controller.showPrevCommand(commandList);
     } else if (event.key === "ArrowDown") {
@@ -506,11 +502,11 @@ class Controller {
     else Controller.appendResultParagraph("MTools", true, MTools.evaluatedResultsStringFromParsedCLIArray(parsedCLIArray));
   }
 
-  public static CurrencyConvertValidator(parsedCLIArray: string[]) {
-    if (parsedCLIArray[0] !== "CurrencyConvert") return;
-    let validatorResponse = CurrencyConvert.parsedArrayValidator(parsedCLIArray);
-    if (validatorResponse["isValid"] == false) Controller.appendResultParagraph("CurrencyConvert", false, validatorResponse["errorMessage"]);
-    else Controller.appendResultParagraph("CurrencyConvert", true, CurrencyConvert.evaluatedResultsStringFromParsedCLIArray(parsedCLIArray));
+  public static CCToolsValidator(parsedCLIArray: string[]) {
+    if (parsedCLIArray[0] !== "CCTools") return;
+    let validatorResponse = CCTools.parsedArrayValidator(parsedCLIArray);
+    if (validatorResponse["isValid"] == false) Controller.appendResultParagraph("CCTools", false, validatorResponse["errorMessage"]);
+    else Controller.appendResultParagraph("CCTools", true, CCTools.evaluatedResultsStringFromParsedCLIArray(parsedCLIArray));
   }
 }
 
