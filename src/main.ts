@@ -362,7 +362,7 @@ class CCTools {
       if (currency.denomination === destinationDenomination) destinationRate = currency.exchangeRateJPY;
     });
 
-    let outputAmount = (sourceRate! * Number(sourceAmount)) / destinationRate!;
+    let outputAmount = Math.floor((sourceRate! * Number(sourceAmount)) * 100 / destinationRate!) / 100;
     return `Input: ${sourceAmount} ${sourceDenomination}, Output: ${outputAmount} ${destinationDenomination}`;
   }
 
