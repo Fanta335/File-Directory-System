@@ -45,6 +45,7 @@ p {
 
 .command-output {
   color: #fff;
+  white-space: pre-line;
 }
 
 .prompt-success{

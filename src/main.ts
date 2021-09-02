@@ -121,14 +121,14 @@ class MTools {
 
   static initialValidator(parsedStringInputArray: string[]) {
     let validCommandList = ["add", "subtract", "multiply", "divide", "exp", "log", "abs", "sqrt", "round", "ceil", "floor"];
-    if (parsedStringInputArray[0] === "MTools" && parsedStringInputArray.length != 3) {
-      return { isValid: false, errorMessage: `command line input must contain exactly 3 elements: 'MTools [commandName] [arguments]'` };
-    }
     if (validCommandList.indexOf(parsedStringInputArray[1]) == -1) {
-      return { isValid: false, errorMessage: `MTools only supports the following commands: ${validCommandList.join(",")}` };
+      return { isValid: false, errorMessage: `MTools only supports the following commands:\n${validCommandList.join("\n")}` };
+    }
+    if (parsedStringInputArray.length != 3) {
+      return { isValid: false, errorMessage: `MTools input must contain exactly 3 elements: 'MTools [commandName] [arguments]'` };
     }
     if (!MTools.allStringElementsOfArrayContainNumbers(parsedStringInputArray[2].split(","))) {
-      return { isValid: false, errorMessage: `last element of command line input, arguments, should contain only numbers and commas` };
+      return { isValid: false, errorMessage: `last element of MTools input, arguments, should contain only numbers and commas` };
     }
 
     return { isValid: true, errorMessage: "" };
@@ -271,11 +271,8 @@ class CurrencyConvert {
 
   public static InitialValidator(parsedStringInputArray: string[]) {
     let validCommandList = ["showAvailableLocales", "showDenominations", "convert"];
-    if (parsedStringInputArray[0] !== "CurrencyConvert") {
-      return { isValid: false, errorMessage: `This app only supports following packages: ${config.packages.join(",")}. Input must start with package name.` };
-    }
     if (validCommandList.indexOf(parsedStringInputArray[1]) === -1) {
-      return { isValid: false, errorMessage: `CurrencyConvert only supports the following commands: ${validCommandList.join(",")}` };
+      return { isValid: false, errorMessage: `CurrencyConvert only supports the following commands:\n${validCommandList.join("\n")}` };
     }
 
     return { isValid: true, errorMessage: "" };
@@ -311,7 +308,7 @@ class CurrencyConvert {
   public static singleArgValidator(commandName: string, argsArray: string[]) {
     let locales = CurrencyConvert.showAvailableLocales();
     if (argsArray.length !== 1) return { isValid: false, errorMessage: `command ${commandName} requires 1 argument` };
-    if (locales.indexOf(argsArray[0]) === -1) return { isValid: false, errorMessage: `CurrencyConvert only supports following locales: ${locales.join(",")}` };
+    if (locales.indexOf(argsArray[0]) === -1) return { isValid: false, errorMessage: `CurrencyConvert only supports following locales:\n${locales.join("\n")}` };
 
     return { isValid: true, errorMessage: "" };
   }
@@ -328,11 +325,11 @@ class CurrencyConvert {
     let allDenominations = CurrencyConvert.getAllDenominations();
 
     if (allDenominations.indexOf(source) === -1 || allDenominations.indexOf(destination) === -1) {
-      return { isValid: false, errorMessage: `CurrencyConvert only supports following denominations: ${allDenominations.join(",")}` };
+      return { isValid: false, errorMessage: `CurrencyConvert only supports following denominations:\n${allDenominations.join("\n")}` };
     }
 
     let amount = Number(argsArray[1]);
-    if ((typeof amount !== "number" && isNaN(amount)) || amount <= 0) {
+    if ((typeof amount !== "number" || isNaN(amount)) || amount <= 0) {
       return { isValid: false, errorMessage: `sourceAmount must be number > 0` };
     }
 
@@ -362,7 +359,7 @@ class CurrencyConvert {
     let destinationRate: number;
     CurrencyConvert.currencyList.forEach((currency) => {
       if (currency.denomination === sourceDenomination) sourceRate = currency.exchangeRateJPY;
-      else if (currency.denomination === destinationDenomination) destinationRate = currency.exchangeRateJPY;
+      if (currency.denomination === destinationDenomination) destinationRate = currency.exchangeRateJPY;
     });
 
     let outputAmount = (sourceRate! * Number(sourceAmount)) / destinationRate!;
@@ -380,9 +377,9 @@ class CurrencyConvert {
     let argC = PCA[4];
 
     if (PCA[1] === "showAvailableLocales") {
-      resultMessage = CurrencyConvert.showAvailableLocales().join(",");
+      resultMessage = CurrencyConvert.showAvailableLocales().join("\n");
     } else if (PCA[1] === "showDenominations") {
-      resultMessage = CurrencyConvert.showDenominations(argA).join(",");
+      resultMessage = CurrencyConvert.showDenominations(argA).join("\n");
     } else if (PCA[1] === "convert") {
       resultMessage = CurrencyConvert.convert(argA, argB, argC);
     } else console.log("CurrencyConvert.evaluatedResultsStringFromParsedCLIArray:: invalid command name");
@@ -476,7 +473,7 @@ class Controller {
     if (config.packages.indexOf(parsedStringInputArray[0]) === -1) {
       validatorResponse = {
         isValid: false,
-        errorMessage: `This app only supports following packages: ${config.packages.join(",")}. Input must start with package name.`,
+        errorMessage: `This app only supports following packages:\n${config.packages.join("\n")}.\nInput must start with package name.`,
       };
     }
 
@@ -495,8 +492,9 @@ class Controller {
     }
     config.CLIOutputDiv.innerHTML += `
       <p class="m-0">
-        <span class='${promptColor}'>${promptName}</span><span class="command-output">: ${message}</span>
-      </p>
+        <span class='${promptColor}'>${promptName}: </span><br>
+        <span class="command-output">${message}</span>
+      </p><br>
     `;
     return;
   }
