@@ -31,6 +31,9 @@ $ MTools [command] [args]
 <summary>More command instructions</summary>
 <div>
 
+各コマンドの演算処理は、JavaScriptの組み込みオブジェクトであるMathオブジェクトのメソッドを使用しています。  
+詳細は公式ドキュメントを参照してください（https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Math）。
+
 ## add
 コンマで区切った半角数字の引数を2つ入力してください。
   
@@ -98,20 +101,20 @@ MTools:
 your result is: 4
 ```
 ## sqrt
-半角数字の引数を1つだけ入力してください。
+半角数字の引数を1つだけ入力してください。0以上の数である必要があります。
   
 e.g.
 ```
-$ MTools sqrt -4
+$ MTools sqrt 4
 MTools:
-your result is: 4
+your result is: 2
 ```
 ## ceil
 半角数字の引数を1つだけ入力してください。
   
 e.g.
 ```
-$ MTools ceil -4
+$ MTools ceil 3.2
 MTools:
 your result is: 4
 ```
@@ -120,18 +123,18 @@ your result is: 4
   
 e.g.
 ```
-$ MTools round -4
+$ MTools round 3.2
 MTools:
-your result is: 4
+your result is: 3
 ```
 ## floor
 半角数字の引数を1つだけ入力してください。
   
 e.g.
 ```
-$ MTools floor -4
+$ MTools floor 3.2
 MTools:
-your result is: 4
+your result is: 3
 ```
 
 </div>
